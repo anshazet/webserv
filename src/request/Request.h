@@ -16,40 +16,34 @@ public:
 	virtual void dump() = 0;
 };
 
-// class Request
-// {
-// private:
-// 	void parseRequestLine(std::istringstream &stream);
-// 	void parseHeaders(std::istringstream &stream);
-// 	void parseBody(std::istringstream &stream);
+/*
+void HttpServer::onDataReceiving(ConnectorEvent e)
+{
+	std::string rawRequest = e.getTemp();
+	// Create a pointer to rawRequest to match the expected signature of RequestFactory::build
+	Request *req = RequestFactory().build(&rawRequest); // Now passing the address of rawRequest
 
-// public:
-// 	Request();
-// 	virtual ~Request();
+	if (req != NULL)
+	{ // Use NULL instead of nullptr for C++98 compatibility
+		Processor *processor = ProcessorFactory().build(req);
+		if (processor != NULL)
+		{
+			Response *resp = processor->process(req);
+			if (resp != NULL)
+			{
+				std::string responseText = resp->toString();
+				// Assume you have a method to send the response back to the client
+				// sendResponse(clientFd, responseText); // Example placeholder
 
-// 	Request(const std::string &requestText);
-// 	std::string method;
-// 	std::string url;
-// 	std::string httpVersion;
-// 	std::map<std::string, std::string> headers;
-// 	std::string body;
-
-// 	virtual std::string getValue(std::string paramName) = 0;
-// 	virtual void addParam(std::string paramName, std::string paramValue) = 0;
-// 	virtual std::string getUri() = 0;
-// 	virtual std::string getMethod() = 0;
-// 	virtual void dump() = 0;
-// };
-
-// class Request
-// {
-// private:
-// public:
-// 	Request();
-// 	~Request();
-// 	//	Request(Request const &o);
-// 	//	Request& operator=(Request const &o);
-
-// 	std::string getValue(std::string paramName);
-// 	void addParam(std::string paramName, std::string paramValue);
-// };
+				delete resp; // Clean up dynamically allocated memory
+			}
+			delete processor; // Clean up
+		}
+		delete req; // Clean up
+	}
+	else
+	{
+		// Handle error scenario, maybe log an error or send a default error response
+	}
+}
+*/

@@ -8,8 +8,7 @@
 #include "HttpServer.h"
 #include "connector/TcpConnector.h"
 
-HttpServer::HttpServer() :
-		harl(), connector()
+HttpServer::HttpServer() : harl(), connector()
 {
 }
 
@@ -37,23 +36,22 @@ void HttpServer::init(std::string ipStr, int port)
 
 void HttpServer::onIncomming(ConnectorEvent e)
 {
-
 }
 
 void HttpServer::onDataReceiving(ConnectorEvent e)
 {
-//	std::cout << e.getTemp();
+	//	std::cout << e.getTemp();
 	std::string rawRequest = e.getTemp();
 	Request *req = RequestFactory().build(&rawRequest);
-//	req->dump();
+	//	req->dump();
 
-//	Validator *validator = ValidatorFactory().build(req);
-//	validator->validate(req);
+	//	Validator *validator = ValidatorFactory().build(req);
+	//	validator->validate(req);
 
 	Processor *processor = ProcessorFactory().build(req);
 	Response *resp = processor->process(req);
 
-//Send Response
+	// Send Response
 }
 
 std::string HttpServer::readRequest(int clientFd)
@@ -72,7 +70,8 @@ std::string HttpServer::readRequest(int clientFd)
 	{
 		// Connection closed
 		std::cout << "Client disconnected." << std::endl;
-	} else if (nbytes < 0)
+	}
+	else if (nbytes < 0)
 	{
 		// Error occurred
 		std::cerr << "recv() error: " << strerror(errno) << std::endl;
@@ -93,14 +92,15 @@ void HttpServer::closeClient(int clientFd)
 
 int HttpServer::getListenFd()
 {
-	TcpConnector *tcpConnector = dynamic_cast<TcpConnector*>(connector);
+	TcpConnector *tcpConnector = dynamic_cast<TcpConnector *>(connector);
 	if (tcpConnector)
 	{
 		return tcpConnector->getListenFd();
-	} else
+	}
+	else
 	{
 		std::cerr << "Connector is not properly initialized or wrong type."
-				<< std::endl;
+				  << std::endl;
 		return -1;
 	}
 }
