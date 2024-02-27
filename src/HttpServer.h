@@ -21,25 +21,30 @@
 #include "Harl.h"
 #include "connector/Connector.h"
 #include "connector/ConnectorFactory.h"
+#include "request/Request.h"
+#include "request/RequestFactory.h"
+#include "processor/Processor.h"
+#include "processor/ProcessorFactory.h"
 
 #define BUF_SIZE 1024
 
-class HttpServer: public ConnectorListener {
+class HttpServer : public ConnectorListener
+{
 private:
-//	std::list<Connector> consListenersList;
+	//	std::list<Connector> consListenersList;
 
 	Connector *connector;
 
 	Harl harl;
 	std::map<int, int> _clients;
 
-//	void _process_ready_for_read(int fwPort, int _soListen, netStruct NS);
-//	void _listen(int _soListen, netStruct ns);
-//	void _acceptIncomingCon(int new_sd, int &_soListen, struct pollfd fds[],
-//			int &end_server, int &nfds);
-//	bool _onDataReceiving(struct pollfd &curentPollFd, int &close_conn);
-//
-//	int _newClient(int _soListen, netStruct NS);
+	//	void _process_ready_for_read(int fwPort, int _soListen, netStruct NS);
+	//	void _listen(int _soListen, netStruct ns);
+	//	void _acceptIncomingCon(int new_sd, int &_soListen, struct pollfd fds[],
+	//			int &end_server, int &nfds);
+	//	bool _onDataReceiving(struct pollfd &curentPollFd, int &close_conn);
+	//
+	//	int _newClient(int _soListen, netStruct NS);
 public:
 	HttpServer();
 	~HttpServer();
@@ -47,6 +52,8 @@ public:
 	void init(std::string ipStr, int port);
 	void onIncomming(ConnectorEvent e);
 	void onDataReceiving(ConnectorEvent e);
-
+	std::string readRequest(int clientFd);
+	void sendResponse(int clientFd, const std::string &response);
+	void closeClient(int clientFd);
+	int getListenFd();
 };
-

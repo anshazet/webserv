@@ -7,12 +7,17 @@
 
 #include "RequestFactory.h"
 
-RequestFactory::RequestFactory() {
+RequestFactory::RequestFactory()
+{
 	// TODO Auto-generated constructor stub
-
 }
 
-RequestFactory::~RequestFactory() {
+RequestFactory::~RequestFactory()
+{
 	// TODO Auto-generated destructor stub
 }
 
+Request *RequestFactory::build(std::string *rawContent)
+{
+	return new RequestHttp(rawContent);
+}

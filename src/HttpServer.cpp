@@ -6,28 +6,28 @@
  */
 
 #include "HttpServer.h"
+#include "connector/TcpConnector.h"
 
 HttpServer::HttpServer() :
-		harl() {
-
+		harl(), connector()
+{
 }
 
-HttpServer::~HttpServer() {
+HttpServer::~HttpServer()
+{
 }
 
-//bool HttpServer::operator==(const ConnectorListener &o) {
-////	if (o)
-//	return this->_soListen ==  o._soListen;
-////	return 0;
-//}
-void shutFd(int fd) {
-	if (fd >= 0) {
+void shutFd(int fd)
+{
+	if (fd >= 0)
+	{
 		shutdown(fd, SHUT_RDWR);
 		close(fd);
 		fd = -1;
 	}
 }
-void HttpServer::init(std::string ipStr, int port) {
+void HttpServer::init(std::string ipStr, int port)
+{
 	netStruct ns;
 	connector = ConnectorFactory().build(ipStr, port);
 	connector->registerIt(this);
@@ -35,18 +35,72 @@ void HttpServer::init(std::string ipStr, int port) {
 	connector->doListen();
 }
 
-void HttpServer::onIncomming(ConnectorEvent e) {
+void HttpServer::onIncomming(ConnectorEvent e)
+{
 
 }
-void HttpServer::onDataReceiving(ConnectorEvent e) {
-//	int len = rc;
-//	harl.debug("  %d bytes received", len);
-	std::cout << e.getTemp();
 
-//	rc = send(curentPollFd.fd, buffer, len, 0);
-//	if (rc < 0) {
-//		harl.error("  send() failed");
-//		close_conn = 1;
-//		break;
-//	}
+void HttpServer::onDataReceiving(ConnectorEvent e)
+{
+//	std::cout << e.getTemp();
+	std::string rawRequest = e.getTemp();
+	Request *req = RequestFactory().build(&rawRequest);
+//	req->dump();
+
+//	Validator *validator = ValidatorFactory().build(req);
+//	validator->validate(req);
+
+	Processor *processor = ProcessorFactory().build(req);
+	Response *resp = processor->process(req);
+
+//Send Response
+}
+
+std::string HttpServer::readRequest(int clientFd)
+{
+	char buffer[BUF_SIZE];
+	std::string requestText;
+	int nbytes;
+
+	while ((nbytes = recv(clientFd, buffer, sizeof(buffer), 0)) > 0)
+	{
+		requestText.append(buffer, nbytes);
+	}
+
+	// Check for socket closed or error
+	if (nbytes == 0)
+	{
+		// Connection closed
+		std::cout << "Client disconnected." << std::endl;
+	} else if (nbytes < 0)
+	{
+		// Error occurred
+		std::cerr << "recv() error: " << strerror(errno) << std::endl;
+	}
+
+	return requestText;
+}
+
+void HttpServer::sendResponse(int clientFd, const std::string &response)
+{
+	send(clientFd, response.c_str(), response.size(), 0);
+}
+
+void HttpServer::closeClient(int clientFd)
+{
+	shutFd(clientFd);
+}
+
+int HttpServer::getListenFd()
+{
+	TcpConnector *tcpConnector = dynamic_cast<TcpConnector*>(connector);
+	if (tcpConnector)
+	{
+		return tcpConnector->getListenFd();
+	} else
+	{
+		std::cerr << "Connector is not properly initialized or wrong type."
+				<< std::endl;
+		return -1;
+	}
 }
