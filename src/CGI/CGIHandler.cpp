@@ -128,6 +128,15 @@ void CGIHandler::logError(const std::string &message)
     }
 }
 
+void CGIHandler::logSuccess(const std::string &message)
+{
+    std::ofstream logFile("access_log.txt", std::ios::app); // Append to the log file
+    if (logFile)
+    {
+        logFile << message << std::endl;
+    }
+}
+
 /*
 void CGIHandler::logError(const std::string &message, int exitStatus)
 {
@@ -142,12 +151,3 @@ void CGIHandler::logError(const std::string &message, int exitStatus)
     }
 }
 */
-
-void CGIHandler::logSuccess(const std::string &message)
-{
-    std::ofstream logFile("access_log.txt", std::ios::app); // Append to the log file
-    if (logFile)
-    {
-        logFile << message << std::endl;
-    }
-}
