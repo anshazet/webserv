@@ -137,17 +137,63 @@ void CGIHandler::logSuccess(const std::string &message)
     }
 }
 
-/*
-void CGIHandler::logError(const std::string &message, int exitStatus)
+void CGIHandler::setupEnvironmentVariables(const std::map<std::string,
+                                                          std::string> &requestHeaders,
+                                           const std::string &requestMethod,
+                                           const std::string &queryString)
 {
-    std::stringstream ss;
-    ss << exitStatus; // Convert integer to string
-    std::string exitStatusStr = ss.str();
+    // Example environment variables
+    setenv("REQUEST_METHOD", requestMethod.c_str(), 1);
+    setenv("QUERY_STRING", queryString.c_str(), 1);
 
-    std::ofstream logFile("error_log.txt", std::ios::app); // Append to the log file
-    if (logFile)
+    // More variables if needed
+}
+
+std::string CGIHandler::executeCGIScript(const std::string &scriptPath)
+{
+    int pipefd[2];
+    pipe(pipefd); // Create a pipe
+
+    pid_t pid = fork();
+    if (pid == 0)
     {
-        logFile << message << ": " << exitStatusStr << std::endl;
+        // Child process
+        close(pipefd[0]);               // Close unused read end
+        dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe
+        execl(scriptPath.c_str(), scriptPath.c_str(), (char *)NULL);
+        exit(EXIT_FAILURE); // execl only returns on error
+    }
+    else
+    {
+        // Parent process
+        close(pipefd[1]); // Close unused write end
+
+        char buffer[1024];
+        std::string output;
+        ssize_t count;
+        while ((count = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0)
+        {
+            buffer[count] = '\0';
+            output += buffer;
+        }
+
+        close(pipefd[0]); // Close read end
+        return output;
     }
 }
-*/
+
+std::string CGIHandler::captureScriptOutput(int fileDescriptor)
+{
+    std::stringstream output;
+    char buffer[1024];
+    ssize_t bytesRead;
+
+    while ((bytesRead = read(fileDescriptor, buffer, sizeof(buffer) - 1)) > 0)
+    {
+        buffer[bytesRead] = '\0';
+        output << buffer;
+    }
+
+    close(fileDescriptor);
+    return output.str();
+}
