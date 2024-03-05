@@ -38,21 +38,21 @@ void HttpServer::onIncomming(ConnectorEvent e)
 {
 }
 
-void HttpServer::onDataReceiving(ConnectorEvent e)
-{
-	//	std::cout << e.getTemp();
-	std::string rawRequest = e.getTemp();
-	Request *req = RequestFactory().build(&rawRequest);
-	//	req->dump();
+// void HttpServer::onDataReceiving(ConnectorEvent e)
+// {
+// 	//	std::cout << e.getTemp();
+// 	std::string rawRequest = e.getTemp();
+// 	Request *req = RequestFactory().build(&rawRequest);
+// 	//	req->dump();
 
-	//	Validator *validator = ValidatorFactory().build(req);
-	//	validator->validate(req);
+// 	//	Validator *validator = ValidatorFactory().build(req);
+// 	//	validator->validate(req);
 
-	Processor *processor = ProcessorFactory().build(req);
-	Response *resp = processor->process(req);
+// 	Processor *processor = ProcessorFactory().build(req);
+// 	Response *resp = processor->process(req);
 
-	// Send Response
-}
+// 	// Send Response
+// }
 
 std::string HttpServer::readRequest(int clientFd)
 {
@@ -102,5 +102,88 @@ int HttpServer::getListenFd()
 		std::cerr << "Connector is not properly initialized or wrong type."
 				  << std::endl;
 		return -1;
+	}
+}
+
+void HttpServer::onDataReceiving(ConnectorEvent e)
+{
+	std::string rawRequest = e.getTemp();
+	HttpRequest httpRequest(rawRequest);
+
+	if (isCGIRequest(httpRequest.getUri()))
+	{
+		CGIHandler cgiHandler;
+		std::map<std::string, std::string> envVars = prepareCGIEnvironment(httpRequest);
+		std::string scriptPath = getScriptPath(httpRequest.getUri());
+
+		std::string cgiOutput = cgiHandler.executeCGIScript(scriptPath);
+		std::string httpResponse = generateHttpResponse(cgiOutput);
+
+		sendResponse(e.getClientFd(), httpResponse);
+	}
+	else
+	{
+		// Handle non-CGI requests as usual
+	}
+}
+
+bool HttpServer::isCGIRequest(const std::string &uri)
+{
+	// Check if URI starts with /cgi-bin/
+	return uri.find("/cgi-bin/") == 0;
+}
+
+std::map<std::string, std::string> HttpServer::prepareCGIEnvironment(const HttpRequest &request)
+{
+	size_t queryPos = request.getUri().find('?');
+	// Clear existing environment variables
+	env.clear();
+
+	// Populate environment variables
+	env["REQUEST_METHOD"] = request.getMethod();
+	if (queryPos != std::string::npos)
+	{
+		env["QUERY_STRING"] = request.getUri().substr(queryPos + 1);
+	}
+	else
+	{
+		env["QUERY_STRING"] = "";
+	}
+	env["CONTENT_TYPE"] = request.getValue("Content-Type");
+	env["CONTENT_LENGTH"] = request.getValue("Content-Length");
+	return env;
+}
+
+std::string HttpServer::getScriptPath(const std::string &uri)
+{
+	// Example: Assuming CGI scripts are located in /var/www/cgi-bin/
+	std::string basePath = "/var/www";
+	return basePath + uri;
+}
+
+std::string HttpServer::generateHttpResponse(const std::string &cgiOutput)
+{
+	std::string response;
+
+	// Parse CGI output for headers and body
+	size_t pos = cgiOutput.find("\r\n\r\n");
+	std::string headers = cgiOutput.substr(0, pos);
+	std::string body = cgiOutput.substr(pos + 4);
+
+	// Construct HTTP response
+	response = "HTTP/1.1 200 OK\r\n" + headers + "\r\n\r\n" + body;
+	return response;
+}
+
+int HttpServer::getClientFd(int clientId)
+{
+	std::map<int, int>::const_iterator it = _clients.find(clientId);
+	if (it != _clients.end())
+	{
+		return it->second; // Return the file descriptor for the client
+	}
+	else
+	{
+		return -1; // Indicate that the client was not found
 	}
 }

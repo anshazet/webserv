@@ -22,6 +22,8 @@
 #include "connector/Connector.h"
 #include "connector/ConnectorFactory.h"
 #include "request/Request.h"
+#include "request/HttpRequest.h"
+#include "CGI/CGIHandler.h"
 #include "request/RequestFactory.h"
 #include "processor/Processor.h"
 #include "processor/ProcessorFactory.h"
@@ -37,6 +39,8 @@ private:
 
 	Harl harl;
 	std::map<int, int> _clients;
+	std::map<std::string, std::string> env;
+	std::map<std::string, std::string> prepareCGIEnvironment(const HttpRequest &request);
 
 	//	void _process_ready_for_read(int fwPort, int _soListen, netStruct NS);
 	//	void _listen(int _soListen, netStruct ns);
@@ -51,9 +55,14 @@ public:
 
 	void init(std::string ipStr, int port);
 	void onIncomming(ConnectorEvent e);
-	void onDataReceiving(ConnectorEvent e);
+	// void onDataReceiving(ConnectorEvent e);
 	std::string readRequest(int clientFd);
 	void sendResponse(int clientFd, const std::string &response);
 	void closeClient(int clientFd);
 	int getListenFd();
+	void onDataReceiving(ConnectorEvent e);
+	bool isCGIRequest(const std::string &uri);
+	std::string getScriptPath(const std::string &uri);
+	std::string generateHttpResponse(const std::string &cgiOutput);
+	int getClientFd(int clientId);
 };

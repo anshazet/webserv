@@ -5,7 +5,7 @@
 #include <iostream>
 #include <sstream>
 
-class RequestHttp: public Request
+class RequestHttp : public Request
 {
 	std::map<std::string, std::string> kv;
 	std::string uri;
@@ -14,15 +14,13 @@ class RequestHttp: public Request
 public:
 	RequestHttp();
 	~RequestHttp();
-//	RequestHttp(const RequestHttp &other);
-//	RequestHttp& operator=(const RequestHttp &other);
+	//	RequestHttp(const RequestHttp &other);
+	//	RequestHttp& operator=(const RequestHttp &other);
 	RequestHttp(std::string *rawContent);
 
-	std::string getValue(std::string paramName);
+	std::string getValue(std::string paramName) const;
 	void addParam(std::string paramName, std::string paramValue);
-	std::string getUri();
-	std::string getMethod();
-	void dump();
-
+	std::string getUri() const;
+	std::string getMethod() const;
+	void dump() const;
 };
-

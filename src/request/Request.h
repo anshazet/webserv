@@ -9,11 +9,11 @@ class Request
 public:
 	virtual ~Request(){};
 
-	virtual std::string getValue(std::string paramName) = 0;
+	virtual std::string getValue(std::string paramName) const = 0;
 	virtual void addParam(std::string paramName, std::string paramValue) = 0;
-	virtual std::string getUri() = 0;
-	virtual std::string getMethod() = 0;
-	virtual void dump() = 0;
+	virtual std::string getUri() const = 0;
+	virtual std::string getMethod() const = 0;
+	virtual void dump() const = 0;
 };
 
 /*

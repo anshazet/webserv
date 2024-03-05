@@ -72,7 +72,7 @@ void HttpRequest::parseBody(std::istringstream &stream)
 }
 
 // Gets the value of a specific parameter by name
-std::string HttpRequest::getValue(std::string paramName)
+std::string HttpRequest::getValue(std::string paramName) const
 {
     std::map<std::string, std::string>::const_iterator it = headers.find(paramName);
     if (it != headers.end())
@@ -90,19 +90,19 @@ void HttpRequest::addParam(std::string paramName, std::string paramValue)
 }
 
 // Returns the request URI
-std::string HttpRequest::getUri()
+std::string HttpRequest::getUri() const
 {
     return url;
 }
 
 // Returns the HTTP method
-std::string HttpRequest::getMethod()
+std::string HttpRequest::getMethod() const
 {
     return method;
 }
 
 // The request contents for debugging
-void HttpRequest::dump()
+void HttpRequest::dump() const
 {
     std::map<std::string, std::string>::const_iterator it;
     for (it = headers.begin(); it != headers.end(); ++it)

@@ -21,9 +21,9 @@ public:
     HttpRequest(const std::string &requestText);
     virtual ~HttpRequest(){};
 
-    virtual std::string getValue(std::string paramName);
+    virtual std::string getValue(std::string paramName) const;
     virtual void addParam(std::string paramName, std::string paramValue);
-    virtual std::string getUri();
-    virtual std::string getMethod();
-    virtual void dump();
+    virtual std::string getUri() const;
+    virtual std::string getMethod() const;
+    virtual void dump() const;
 };
