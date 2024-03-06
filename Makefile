@@ -14,11 +14,24 @@ SRCS = \
 	request/RequestHttp.cpp \
 	request/RequestFactory.cpp \
 	request/HttpRequest.cpp \
-	response/Response.cpp \
 	processor/ProcessorFactory.cpp \
 	processor/ProcessorImplDirectFs.cpp \
  	processor/Processor.cpp \
     HttpServer.cpp \
+    config.h \
+    config/Config.cpp \
+    config/ConfigFactory.cpp \
+	response/API/Response.cpp \
+	response/API/ResponseHeader.cpp \
+	response/ResponseHttp.cpp \
+	response/ResponseHttpHeader.cpp \
+ 	response/ResponseTools.cpp \
+ 	response/factory/ResponseHeaderFactory.cpp \
+    response/factory/ResponseFactory.cpp \
+    util/FileUtil.cpp \
+    util/FileUtilFactory.cpp \
+    util/StringUtil.cpp \
+	CGI/CGIHandler.cpp \
 	main.cpp 
 	
 OBJS = $($(addprefix src/,${SRCS}):.cpp=.o)
