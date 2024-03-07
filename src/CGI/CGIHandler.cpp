@@ -144,6 +144,7 @@ void CGIHandler::setupEnvironmentVariables(const std::map<std::string, std::stri
     // Example environment variables
     setenv("REQUEST_METHOD", requestMethod.c_str(), 1);
     setenv("QUERY_STRING", queryString.c_str(), 1);
+    setenv("REDIRECT_STATUS", "200", 1);
 
     // More variables if needed
 }
@@ -189,41 +190,6 @@ std::string CGIHandler::executeCGIScript(const std::string &scriptPath, const st
         return output;
     }
 }
-
-/*
-std::string CGIHandler::executeCGIScript(const std::string &scriptPath)
-{
-    int pipefd[2];
-    pipe(pipefd); // Create a pipe
-
-    pid_t pid = fork();
-    if (pid == 0)
-    {
-        // Child process
-        close(pipefd[0]);               // Close unused read end
-        dup2(pipefd[1], STDOUT_FILENO); // Redirect stdout to pipe
-        execl(scriptPath.c_str(), scriptPath.c_str(), (char *)NULL);
-        exit(EXIT_FAILURE); // execl only returns on error
-    }
-    else
-    {
-        // Parent process
-        close(pipefd[1]); // Close unused write end
-
-        char buffer[1024];
-        std::string output;
-        ssize_t count;
-        while ((count = read(pipefd[0], buffer, sizeof(buffer) - 1)) > 0)
-        {
-            buffer[count] = '\0';
-            output += buffer;
-        }
-
-        close(pipefd[0]); // Close read end
-        return output;
-    }
-}
-*/
 
 std::string CGIHandler::captureScriptOutput(int fileDescriptor)
 {

@@ -30,3 +30,6 @@ public:
                                  const std::map<std::string, std::string> &requestHeaders,
                                  const std::string &requestMethod, const std::string &queryString);
 };
+
+// PHP CLI: Your PHP script starts with #!/usr/bin/php, indicating it's intended to be executed by the PHP CLI.
+// Make sure your server is configured to handle PHP CGI scripts and that the PHP CLI is properly installed and accessible.

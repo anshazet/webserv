@@ -54,7 +54,7 @@ void HttpServer::onDataReceiving(ConnectorEvent e)
 {
 	// Retrieve the request from the event
 	std::string rawRequest = e.getTemp();
-	HttpRequest httpRequest(rawRequest); // Assuming HttpRequest can be instantiated directly from rawRequest
+	HttpRequest httpRequest(rawRequest);
 
 	// Extract the request method and query string
 	std::string requestMethod = httpRequest.getMethod();
@@ -333,8 +333,8 @@ std::map<std::string, std::string> HttpServer::prepareCGIEnvironment(const HttpR
 
 std::string HttpServer::getScriptPath(const std::string &uri)
 {
-	// Example: Assuming CGI scripts are located in /var/www/cgi-bin/
-	std::string basePath = "/var/www";
+	// adapt for correct path !
+	std::string basePath = "/home/parallels/Desktop/Parallels Shared Folders/42/webserv/src";
 	return basePath + uri;
 }
 
