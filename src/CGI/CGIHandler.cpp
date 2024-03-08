@@ -141,12 +141,10 @@ void CGIHandler::setupEnvironmentVariables(const std::map<std::string, std::stri
                                            const std::string &requestMethod,
                                            const std::string &queryString)
 {
-    // Example environment variables
+    // Environment variables
     setenv("REQUEST_METHOD", requestMethod.c_str(), 1);
     setenv("QUERY_STRING", queryString.c_str(), 1);
     setenv("REDIRECT_STATUS", "200", 1);
-
-    // More variables if needed
 }
 
 std::string CGIHandler::executeCGIScript(const std::string &scriptPath, const std::map<std::string, std::string> &requestHeaders, const std::string &requestMethod, const std::string &queryString)
