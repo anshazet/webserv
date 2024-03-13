@@ -31,5 +31,10 @@ public:
                                  const std::string &requestMethod, const std::string &queryString);
 };
 
-// PHP CLI: Your PHP script starts with #!/usr/bin/php, indicating it's intended to be executed by the PHP CLI.
-// Make sure your server is configured to handle PHP CGI scripts and that the PHP CLI is properly installed and accessible.
+// export REQUEST_METHOD=GET
+// export QUERY_STRING="param1=value1&param2=value2"
+// export REDIRECT_STATUS=200
+// php-cgi /home/parallels/Desktop/Parallels Shared Folders/42/webserv/src/cgi-bin/show_request_info.php
+
+// /etc/php/8.1/cli php.ini
+// cgi.force_redirect = 0

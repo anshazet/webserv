@@ -10,10 +10,12 @@ SRCS = \
 	connector/ConnectorListener.cpp \
 	connector/HttpConnector.cpp \
 	connector/TcpConnector.cpp \
-	request/Request.cpp \
+	request/API/Request.cpp \
+	request/API/RequestHeader.cpp \
+	request/RequestHttpHeader.cpp \
 	request/RequestHttp.cpp \
-	request/RequestFactory.cpp \
-	request/HttpRequest.cpp \
+	request/factory/RequestFactory.cpp \
+	request/factory/RequestHeaderFactory.cpp \
 	processor/ProcessorFactory.cpp \
 	processor/ProcessorImplDirectFs.cpp \
  	processor/Processor.cpp \
@@ -21,6 +23,8 @@ SRCS = \
     config.h \
     config/Config.cpp \
     config/ConfigFactory.cpp \
+   	config/ConfigReader.cpp \
+   	config/ConfigValidator.cpp \
 	response/API/Response.cpp \
 	response/API/ResponseHeader.cpp \
 	response/ResponseHttp.cpp \
@@ -43,22 +47,32 @@ LFLAGS = #-lreadline
 
 RM = rm -rf
 
+GREEN		= \033[0;32m
+
+NAME		= webserv
+
 all: $(NAME)
 
 $(NAME):  
 
-	$(CC) ${INC} $(CFLAGS) $(addprefix src/,${SRCS}) $(LFLAGS) -o $(NAME) -g
+	@$(CC) ${INC} $(CFLAGS) $(addprefix src/,${SRCS}) $(LFLAGS) -o $(NAME) -g
+	@echo "$(GREEN)Executable $(NAME) is ready.$(RESET)"
 
 prof:
 	$(CC) ${INC} $(CFLAGS) $(addprefix src/,${SRCS}) $(LFLAGS) -o $(NAME)_prof -g -pg
 	
+re: 
+	rm -f $(NAME) debug
+	$(CC) ${INC} $(CFLAGS) $(addprefix src/,${SRCS}) $(LFLAGS) -o $(NAME) -g
+
 clean:
-	rm -f $(OBJS)
+	@rm -f $(OBJS)
+	@echo "$(GREEN)Object files removed$(RESET)"
 	
 
 fclean: clean
-	rm -f $(NAME)
-	rm -f debug
+	@rm -f $(NAME)
+	@rm -f debug
+	@echo "$(YELLOW)Executable $(NAME) removed.$(RESET)"
 
 re: fclean all
-
