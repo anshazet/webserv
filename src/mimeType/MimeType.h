@@ -1,19 +1,19 @@
 #pragma once
-#include <list>
 #include <string>
-#include <utility>
-#include <fstream>
-#include <sstream>
 
 class MimeType
 {
 private:
-    std::list<std::pair<std::string, std::string> > mappings;
+    std::string extension; // Key
+    std::string mimeType;  // Value
 
 public:
     MimeType();
+    MimeType(const std::string &ext, const std::string &mType);
     ~MimeType();
-    void addMapping(const std::string &extension, const std::string &mimeType);
-    std::string findMimeType(const std::string &extension) const;
-    void setMimeType(const std::string &extension, const std::string &newMimeType);
+
+    std::string getExtension() const;
+    std::string getMimeType() const;
+    void setExtension(const std::string &ext);
+    void setMimeType(const std::string &mType);
 };

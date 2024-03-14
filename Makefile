@@ -18,7 +18,13 @@ SRCS = \
 	request/factory/RequestHeaderFactory.cpp \
 	processor/ProcessorFactory.cpp \
 	processor/ProcessorImplDirectFs.cpp \
+	processor/ProcessorImplCgiBinPhp.cpp \
+	processor/CGI/CGIHandler.cpp \
  	processor/Processor.cpp \
+ 	location/LocationToProcessor.cpp \
+ 	location/ProcessorLocator.cpp \
+	mimeType/MimeType.cpp \
+	mimeType/MimeTypeHelper.cpp \
     HttpServer.cpp \
     config.h \
     config/Config.cpp \
@@ -35,7 +41,6 @@ SRCS = \
     util/FileUtil.cpp \
     util/FileUtilFactory.cpp \
     util/StringUtil.cpp \
-	CGI/CGIHandler.cpp \
 	main.cpp 
 	
 OBJS = $($(addprefix src/,${SRCS}):.cpp=.o)
@@ -47,10 +52,6 @@ LFLAGS = #-lreadline
 
 RM = rm -rf
 
-GREEN		= \033[0;32m
-
-NAME		= webserv
-
 all: $(NAME)
 
 $(NAME):  
@@ -61,18 +62,16 @@ $(NAME):
 prof:
 	$(CC) ${INC} $(CFLAGS) $(addprefix src/,${SRCS}) $(LFLAGS) -o $(NAME)_prof -g -pg
 	
-re: 
-	rm -f $(NAME) debug
-	$(CC) ${INC} $(CFLAGS) $(addprefix src/,${SRCS}) $(LFLAGS) -o $(NAME) -g
-
 clean:
-	@rm -f $(OBJS)
-	@echo "$(GREEN)Object files removed$(RESET)"
+	rm -f $(OBJS)
 	
 
 fclean: clean
-	@rm -f $(NAME)
-	@rm -f debug
-	@echo "$(YELLOW)Executable $(NAME) removed.$(RESET)"
+	rm -f $(NAME)
+	rm -f debug
+re: 
+	@rm -f $(NAME) debug
+	@$(CC) ${INC} $(CFLAGS) $(addprefix src/,${SRCS}) $(LFLAGS) -o $(NAME) -g
+
 
 re: fclean all
