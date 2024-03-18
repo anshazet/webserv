@@ -4,8 +4,7 @@ RequestHttpHeader::~RequestHttpHeader()
 {
 }
 
-RequestHttpHeader::RequestHttpHeader(std::string *rawRequest) :
-		statusLine(), fields()
+RequestHttpHeader::RequestHttpHeader(std::string *rawRequest) : fields()
 {
 	std::stringstream lines;
 	lines.str(rawRequest->c_str());
@@ -28,6 +27,8 @@ RequestHttpHeader::RequestHttpHeader(std::string *rawRequest) :
 			this->addField(std::string(val));
 		}
 	}
+	//cookie set plusieurs fois ?
+	//CookieFactory().build(this);
 }
 
 std::string RequestHttpHeader::getFieldValue(std::string fieldName) const
@@ -48,6 +49,15 @@ std::string RequestHttpHeader::getFieldValue(std::string fieldName) const
 	return ret;
 }
 
+std::string RequestHttpHeader::toString()
+{
+	std::string ret = "";
+	ret += "RequestHttpHeader : Method : [" + getMethod() + "]\t[" + getUri() + "]\t[" + getVersion() + "]\n";
+
+	StringUtil su = StringUtil();
+	ret += su.dedoublonne(su.fromListToString(fields), "\n");
+	return ret;
+}
 void RequestHttpHeader::addField(std::string f)
 {
 	if (!f.empty())
@@ -87,4 +97,34 @@ const std::string& RequestHttpHeader::getVersion() const
 void RequestHttpHeader::setVersion(const std::string &v)
 {
 	version = v;
+}
+
+Cookie RequestHttpHeader::getCookie(const std::string &cookieName)
+{
+	return cookieHelper.getCookie(cookies, cookieName);
+}
+
+bool RequestHttpHeader::addCookie(const Cookie &cookie)
+{
+	bool ret = false;
+	int i = cookies.size();
+	cookies = cookieHelper.addCookie(cookies, cookie);
+	if (cookies.size() > i)
+		ret = true;
+	return ret;
+}
+
+bool RequestHttpHeader::removeCookie(const std::string &cookieName)
+{
+	bool ret = false;
+	int i = cookies.size();
+	cookies = cookieHelper.removeCookie(cookies, cookieName);
+	if (cookies.size() < i)
+		ret = true;
+	return ret;
+}
+
+std::string RequestHttpHeader::getCookieString()
+{
+	return cookieHelper.getCookieString(cookies);
 }
