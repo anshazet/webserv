@@ -26,30 +26,27 @@ std::string FiltreResponseMimeType::getResponseMimeType(const std::string &fileP
 Response *FiltreResponseMimeType::process(Request *request, Response *response,
                                           ProcessorAndLocationToProcessor *processorAndLocationToProcessor)
 {
-    // Cast the Request and Response to their derived types if you're sure about the object types.
-    RequestHttp *httpReq = static_cast<RequestHttp *>(request);
-    ResponseHttp *httpResp = static_cast<ResponseHttp *>(response);
+    ResponseHeader *header = ResponseHeaderFactory().build();
+    Response *resp = ResponseFactory().build(header);
 
-    if (!httpReq || !httpResp)
-        return response; // Safety check
-
-    // Use getPath() from RequestHttp to get the path (assuming it gives the file path)
-    std::string path = httpReq->getPath();
+    std::string path;
+    if (RequestHttp *httpReq = dynamic_cast<RequestHttp *>(request))
+    {
+        path = httpReq->getPath();
+    }
+    else
+    {
+        return resp;
+    }
 
     // Extracting MIME type using the file path
     std::string mimeType = getResponseMimeType(path);
 
-    // Assuming ResponseHttp's header can be used to set MIME type.
-    // If direct manipulation isn't possible, you might need to adjust how headers are set.
-    ResponseHeader *respHeader = httpResp->getHeader();
-    if (respHeader)
+    // Add MIME type to the response header
+    if (header)
     {
-        // Construct the Content-Type header string
         std::string contentTypeHeader = "Content-Type: " + mimeType;
-        // Add this header to the response. This assumes you have a method to add headers
-        // directly or manipulate the header's fields in ResponseHeader.
-        // This is a placeholder for how you might add the header.
-        respHeader->addField(contentTypeHeader);
+        header->addField(contentTypeHeader);
     }
 
     return response;
@@ -57,25 +54,82 @@ Response *FiltreResponseMimeType::process(Request *request, Response *response,
 
 void FiltreResponseMimeType::setConfig(Config *conf)
 {
-    // Example implementation, adjust according to how Config is designed
-    // For example, if Config allows retrieving properties by name:
-    std::string mimeTypesFilePath = conf->getProperty("mimeTypesFilePath");
+    // Use the correct method to retrieve configuration parameters
+    std::string mimeTypesFilePath = conf->getParamStr("mimeTypesFilePath", "example/mime.types");
     if (!mimeTypesFilePath.empty())
     {
-        // Assuming MimeTypeHelper can be reinitialized or updated with a new file
-        mimeTypeHelper.loadMappingsFromFile(mimeTypesFilePath);
+        mimeTypeHelper.reloadMappingsFromFile(mimeTypesFilePath);
     }
 }
 
 std::string FiltreResponseMimeType::toString()
 {
-    return "FiltreResponseMimeType Processor";
+    std::ostringstream oss;
+    oss << "FiltreResponseMimeType Processor with ";
+    oss << mimeTypeHelper.numberOfMappings();
+    oss << " MIME type mappings.";
+    return oss.str(); // Convert the ostringstream to string and return it
+}
+
+// void FiltreResponseMimeType::addProperty(std::string name, std::string value)
+// {
+//     properties[name] = value;
+// }
+
+std::string FiltreResponseMimeType::getProperty(const std::string &name) const
+{
+    std::map<std::string, std::string>::const_iterator it = properties.find(name);
+    if (it != properties.end())
+    {
+        return it->second;
+    }
+    return ""; // Return empty string if the property is not found
 }
 
 void FiltreResponseMimeType::addProperty(std::string name, std::string value)
 {
-    // Assuming Processor has a std::map or similar to store properties:
-    // properties[name] = value;
-    // But since there's no direct indication of property storage in Processor,
-    // this is a placeholder. You need to adjust this based on your actual implementation.
+    properties[name] = value;
+
+    // If a specific property is updated, perform an action
+    if (name == "configReloadTrigger" && value == "true")
+    {
+        // Perform the reload or reset action
+        reloadConfigurations();
+        // Optionally, reset the trigger
+        properties[name] = "false";
+    }
 }
+
+void FiltreResponseMimeType::reloadConfigurations()
+{
+    std::string mimeTypesFilePath = getProperty("example/mime.types");
+    if (!mimeTypesFilePath.empty())
+    {
+        mimeTypeHelper.reloadMappingsFromFile(mimeTypesFilePath);
+    }
+}
+
+// Response *FiltreResponseMimeType::process(Request *request, Response *response,
+//                                           ProcessorAndLocationToProcessor *processorAndLocationToProcessor)
+// {
+//     RequestHttp *httpReq = static_cast<RequestHttp *>(request);
+//     ResponseHttp *httpResp = static_cast<ResponseHttp *>(response);
+
+//     if (!httpReq || !httpResp)
+//         return response;
+
+//     std::string path = httpReq->getPath();
+
+//     // Extracting MIME type using the file path
+//     std::string mimeType = getResponseMimeType(path);
+
+//     ResponseHeader *respHeader = httpResp->getHeader();
+//     if (respHeader)
+//     {
+//         // Construct the Content-Type header string
+//         std::string contentTypeHeader = "Content-Type: " + mimeType;
+//         respHeader->addField(contentTypeHeader);
+//     }
+
+//     return response;
+// }
