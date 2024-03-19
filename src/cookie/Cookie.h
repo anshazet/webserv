@@ -14,7 +14,6 @@ private:
 	std::string _httponly;
 	std::string _name;
 	std::string _value;
-
 public:
 	Cookie();
 	~Cookie();
