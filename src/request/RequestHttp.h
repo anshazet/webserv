@@ -10,7 +10,6 @@
 class RequestHttp : public Request
 {
 private:
-	std::string uri, method, body;
 	RequestHeader *header;
 	int fdClient;
 
@@ -28,10 +27,11 @@ public:
 	virtual void setFdClient(int fd);
 	virtual int getFdClient() const;
 	virtual std::string getQueryString() const;
-	std::string getPath() const;
-	std::string getHost() const;
 	virtual RequestHeader *getHeader() const;
 	virtual std::string getFileExtension() const;
+	virtual std::string getFileName() const;
+	virtual std::string getPath();
+	virtual std::string getHost();
 
 	void setBody(const std::string &b);
 	const std::string &getBody() const;
