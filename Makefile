@@ -37,6 +37,8 @@ SRC_FILES	= \
 	processor/ProcessorFactory \
 	processor/ProcessorImplDirectFs \
 	processor/ProcessorImplCgiBinPhp \
+	processor/FiltreResponseMimeType \
+	processor/FiltreResponseCommon \
 	processor/CGI/CGIHandler \
  	location/LocationToProcessor \
  	location/ProcessorAndLocationToProcessor \
@@ -61,7 +63,8 @@ SRC_FILES	= \
    	cookie/Cookie \
 	cookie/CookieHelper \
 	cookie/factory/CookieFactory \
-	codeHelper/HttpReturnCodeHelper \
+	error/HttpError \
+	error/HttpReturnCodeHelper \
     main 
 #    parser/MultipartParser \
 

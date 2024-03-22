@@ -22,7 +22,7 @@ void HttpServer::init(Config *c)
 	instantiateProcessLocator();
 
 	connector = ConnectorFactory().build(c->getParamStr("listen", "127.0.0.1"),
-										 c->getParamInt("port", 8080));
+			c->getParamInt("port", 8080));
 	connector->registerIt(this);
 
 	connector->doListen();
@@ -76,22 +76,21 @@ void HttpServer::instantiateProcessLocator()
 				processor->addProperty(nameProperty, valProperty);
 			}
 		}
-
 	}
 	Processor *defaultProcessor = processorFactory.build("STATIC_PROCESSOR");
 	Config *configProc = config->clone();
 	defaultProcessor->setConfig(configProc);
 	processorLocator->addLocationToProcessor("/", ".", defaultProcessor, host);
 }
-//void addLocationToProcessor(
-//std::string processorName = su.getNthTokenIfExists(toksDirective, 1, "");
-//std::string extension = su.getNthTokenIfExists(toksDirective, 2, "");
-//processor = processorFactory.build(processorName);
-//processor->setConfig(config);
+// void addLocationToProcessor(
+// std::string processorName = su.getNthTokenIfExists(toksDirective, 1, "");
+// std::string extension = su.getNthTokenIfExists(toksDirective, 2, "");
+// processor = processorFactory.build(processorName);
+// processor->setConfig(config);
 //
-//processorLocator->addLocationToProcessor(urlpath, extension, processor, host);
+// processorLocator->addLocationToProcessor(urlpath, extension, processor, host);
 //
-//}
+// }
 void HttpServer::onIncomming(ConnectorEvent e)
 {
 }
@@ -109,9 +108,11 @@ void HttpServer::onDataReceiving(ConnectorEvent e)
 	harl.info("HttpServer::onDataReceiving : %s", request->getUri().c_str());
 	harl.debug("HttpServer::onDataReceiving : %s", request->getHeader()->toString().c_str());
 
-	Response *resp;
+	ResponseHeader *header = ResponseHeaderFactory().build();
+	Response *resp = ResponseFactory().build(header);
+
 	ProcessorFactory processorFactory = ProcessorFactory(processorLocator);
-	std::vector<ProcessorAndLocationToProcessor *> *processorList = processorFactory.build(request);
+	std::vector<ProcessorAndLocationToProcessor*> *processorList = processorFactory.build(request);
 	resp = runProcessorChain(processorList, request, resp);
 
 	if (!resp)
@@ -125,13 +126,13 @@ void HttpServer::onDataReceiving(ConnectorEvent e)
 	cleanUp(e, request, resp);
 }
 
-Response *HttpServer::runProcessorChain(std::vector<ProcessorAndLocationToProcessor *> *processorList, Request *request,
-										Response *resp)
+Response* HttpServer::runProcessorChain(std::vector<ProcessorAndLocationToProcessor*> *processorList, Request *request,
+		Response *resp)
 {
 	bool contentDone = false;
-	for (std::vector<ProcessorAndLocationToProcessor*>::iterator ite = processorList->begin();
-			ite != processorList->end();
-			ite++)
+	for (std::vector<ProcessorAndLocationToProcessor *>::iterator ite = processorList->begin();
+		 ite != processorList->end();
+		 ite++)
 
 	{
 		ProcessorAndLocationToProcessor *processorAndLocationToProcessor = *ite;
@@ -142,11 +143,11 @@ Response *HttpServer::runProcessorChain(std::vector<ProcessorAndLocationToProces
 			continue;
 		}
 
-//		harl.debug("HttpServer::runProcessorChain : injecting Config [%s]", config->getAlias().c_str());
-//		processor->setConfig(config);
+		//		harl.debug("HttpServer::runProcessorChain : injecting Config [%s]", config->getAlias().c_str());
+		//		processor->setConfig(config);
 
 		harl.debug("HttpServer::runProcessorChain : %s \t processing [%s]", request->getUri().c_str(),
-				   processor->toString().c_str());
+				processor->toString().c_str());
 		resp = processor->process(request, resp, processorAndLocationToProcessor);
 		if (!contentDone && processor->getType() == CONTENT_MODIFIER)
 		{
@@ -157,15 +158,15 @@ Response *HttpServer::runProcessorChain(std::vector<ProcessorAndLocationToProces
 	return resp;
 }
 
-char *HttpServer::packageResponseAndGiveMeSomeBytes(Request *request, Response *resp)
+char* HttpServer::packageResponseAndGiveMeSomeBytes(Request *request, Response *resp)
 {
 	StringUtil stringUtil;
 
-//	std::ostringstream oss;
-//	oss << resp->getBodyLength();
-//	std::string sizeStr = oss.str();
-//
-//	resp->getHeader()->addField("Content-Length", sizeStr);
+	//	std::ostringstream oss;
+	//	oss << resp->getBodyLength();
+	//	std::string sizeStr = oss.str();
+	//
+	//	resp->getHeader()->addField("Content-Length", sizeStr);
 
 	if (!resp || !resp->getHeader() || resp->getHeader()->getStatusLine().empty())
 	{
@@ -173,8 +174,8 @@ char *HttpServer::packageResponseAndGiveMeSomeBytes(Request *request, Response *
 	}
 
 	std::string fieldsString = stringUtil.fromListToString(
-								   resp->getHeader()->getFields()) +
-							   "\r\n";
+			resp->getHeader()->getFields()) +
+			"\r\n";
 	std::string statusLine = resp->getHeader()->getStatusLine();
 	std::string body = "";
 	char *bodyBin = resp->getBodyBin();
